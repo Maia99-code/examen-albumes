@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAlbumesRequests } from '../api/albumes.js'; // Importar la función de API
+import axios from 'axios';
 
 const Home = () => {
   const [albums, setAlbums] = useState([]);
@@ -9,8 +10,9 @@ const Home = () => {
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const response = await getAlbumesRequests(); // Usar la función de la API
+        const response = await axios.get('http://localhost:5000/api/albums'); // Reemplaza con la URL de tu API
         console.log(response.data); // Verifica la estructura de los datos
+
         if (Array.isArray(response.data)) {
           setAlbums(response.data);
         } else {
@@ -38,8 +40,8 @@ const Home = () => {
           {albums.map(album => (
             <li key={album._id}>
               {album.albumName} - {album.artistName}
-              <Link to={`/albums/${album._id}`}>Ver</Link>
-              <Link to={`/albums/${album._id}/edit`}>Editar</Link>
+              <Link to={`/album/${album._id}`}>Ver</Link>
+              <Link to={`/album/${album._id}/edit`}>Editar</Link>
 
             </li>
           ))}

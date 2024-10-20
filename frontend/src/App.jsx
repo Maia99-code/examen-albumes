@@ -15,7 +15,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/create" element={<CreateAlbum />} />
         <Route path="/album/:id" element={<AlbumDetails />} />
-        <Route path="/albums/:id/edit" element={<EditAlbum />} />
+        <Route path="/album/:id/edit" element={<EditAlbum />} />
       </Routes>
       <Toaster />
     </div>

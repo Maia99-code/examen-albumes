@@ -1,24 +1,36 @@
 import axios from 'axios';
 
+// Configuración de Axios con base en el entorno
 const api = axios.create({
-    baseURL: 'http://localhost:5000' // Cambia esto según sea necesario
+    baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api'
 });
 
-//cuando se haga elbuild generara una carptea y direactamente en express y se realizara todo
-//para no poner localhost,, en el json se agregara una propiedad solo para desarrollo
-//getAlbumesRequests función asíncrona que utiliza Axios para realizar una solicitud HTTP GET a la ruta "/home"...
+// Habilitar el envío de cookies para autenticación (si es necesario)
+axios.defaults.withCredentials = true;
 
-export const getAlbumesRequests = async () => await api.get("/home");
+// Función para manejar la respuesta y errores de las peticiones
+const handleResponse = async (promise) => {
+    try {
+        const response = await promise;
+        return response.data; // Solo devuelve los datos
+    } catch (error) {
+        console.error('Error en la API:', error);
+        throw error; // Lanza el error para manejarlo en el lugar de la llamada
+    }
+};
 
-// esta funcion es para crear un album
-export const createAlbumRequest = async (album) => await api.post("/new", album);
+// Obtener la lista de álbumes
+export const getAlbumesRequests = () => handleResponse(api.get("/albums"));
 
-//ruta del back donde se elimina los albumes
-export const deleteAlbumRequest = async id => await api.delete("/album/" + id );
+// Crear un álbum
+export const createAlbumRequest = (album) => handleResponse(api.post("/albums", album));
 
-//ruta del back donde se recibe un id
-export const getAlbumDescRequest = async id => await api.get("/album/" + id )
+// Eliminar un álbum
+export const deleteAlbumRequest = (id) => handleResponse(api.delete(`/albums/${id}`));
 
+// Obtener un álbum específico
+export const getAlbumDescRequest = (id) => handleResponse(api.get(`/albums/${id}`));
 
-// Actualizar un álbum por ID
-export const updateAlbumRequest = async (id, album) => await api.put("/album/" + id, album);
+// Actualizar un álbum
+export const updateAlbumRequest = (id, album) => handleResponse(api.put(`/albums/${id}`, album));
+
