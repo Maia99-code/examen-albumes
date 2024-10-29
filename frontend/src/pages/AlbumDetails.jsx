@@ -10,8 +10,8 @@ const AlbumDetails = () => {
   useEffect(() => {
     const fetchAlbum = async () => {
       try {
-        const response = await getAlbumDescRequest(id); // Llama a la API para obtener el álbum
-        setAlbum(response.data); // Actualiza el estado con los datos del álbum
+        const albumData = await getAlbumDescRequest(id); // No necesitas acceder a "data" porque tu interceptor ya devuelve los datos
+        setAlbum(albumData); // Actualiza el estado con los datos del álbum
       } catch (error) {
         console.error('Error al cargar el álbum:', error);
       }
@@ -43,7 +43,7 @@ const AlbumDetails = () => {
       <div>
         <h2>Canciones</h2>
         <ul>
-          {album.songs.map((song, index) => (
+          {album.songs && album.songs.map((song, index) => (
             <li key={index}>{song}</li>
           ))}
         </ul>

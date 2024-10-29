@@ -1,36 +1,24 @@
 import axios from 'axios';
 
-// Configuración de Axios con base en el entorno
+// Crear instancia de axios con la base URL dinámica
 const api = axios.create({
-    baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api'
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    withCredentials: true, // Habilitar el envío de cookies para autenticación
 });
 
-// Habilitar el envío de cookies para autenticación (si es necesario)
-axios.defaults.withCredentials = true;
-
-// Función para manejar la respuesta y errores de las peticiones
-const handleResponse = async (promise) => {
-    try {
-        const response = await promise;
-        return response.data; // Solo devuelve los datos
-    } catch (error) {
+// Interceptor para manejar respuestas globalmente
+api.interceptors.response.use(
+    (response) => response.data, // Siempre devuelve los datos directamente
+    (error) => {
         console.error('Error en la API:', error);
-        throw error; // Lanza el error para manejarlo en el lugar de la llamada
+        return Promise.reject(error); // Rechaza para que pueda manejarse en el lugar de la llamada
     }
-};
+);
 
-// Obtener la lista de álbumes
-export const getAlbumesRequests = () => handleResponse(api.get("/albums"));
-
-// Crear un álbum
-export const createAlbumRequest = (album) => handleResponse(api.post("/albums", album));
-
-// Eliminar un álbum
-export const deleteAlbumRequest = (id) => handleResponse(api.delete(`/albums/${id}`));
-
-// Obtener un álbum específico
-export const getAlbumDescRequest = (id) => handleResponse(api.get(`/albums/${id}`));
-
-// Actualizar un álbum
-export const updateAlbumRequest = (id, album) => handleResponse(api.put(`/albums/${id}`, album));
+// Funciones para manejar las peticiones
+export const getAlbumsRequests = () => api.get("/albums");
+export const createAlbumRequest = (album) => api.post("/albums", album);
+export const deleteAlbumRequest = (id) => api.delete(`/albums/${id}`);
+export const getAlbumDescRequest = (id) => api.get(`/albums/${id}`);
+export const updateAlbumRequest = (id, album) => api.put(`/albums/${id}`, album);
 

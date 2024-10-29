@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAlbumesRequests } from '../api/albumes.js'; // Importar la función de API
-import axios from 'axios';
+import { getAlbumsRequests } from '../api/albumes.js'; // Cambia 'getAlbumesRequests' a 'getAlbumsRequests'
 
 const Home = () => {
   const [albums, setAlbums] = useState([]);
@@ -10,17 +9,10 @@ const Home = () => {
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/albums'); // Reemplaza con la URL de tu API
-        console.log(response.data); // Verifica la estructura de los datos
-
-        if (Array.isArray(response.data)) {
-          setAlbums(response.data);
-        } else {
-          console.error("La respuesta no es un array", response.data);
-          setError("Error: la respuesta no es un array");
-        }
+        const albumsData = await getAlbumsRequests(); // Llama a la función correcta
+        setAlbums(albumsData); // Actualiza el estado con los datos del álbum
       } catch (error) {
-        console.error(error);
+        console.error('Error al cargar los álbumes:', error);
         setError("Error al cargar los álbumes");
       }
     };
@@ -42,7 +34,6 @@ const Home = () => {
               {album.albumName} - {album.artistName}
               <Link to={`/album/${album._id}`}>Ver</Link>
               <Link to={`/album/${album._id}/edit`}>Editar</Link>
-
             </li>
           ))}
         </ul>

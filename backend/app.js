@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors'; 
 import cookieParser from 'cookie-parser'; 
-import authRoutes from './routes/auth.routes.js'; 
-import albumRoutes from './routes/album.routes.js'; 
+import authRoutes from './routes/auth.routes.js'; // Asegúrate de que la ruta sea correcta
+import albumRoutes from './routes/album.routes.js'; // Asegúrate de que la ruta sea correcta
 
 const app = express();
 
@@ -21,3 +21,7 @@ app.use('/api/auth', authRoutes); // Rutas de autenticación
 app.use('/api/albums', albumRoutes); // Rutas de álbumes
 
 export default app; // Exporta la app
+
+
+
+

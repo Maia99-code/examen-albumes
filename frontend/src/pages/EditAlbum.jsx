@@ -16,11 +16,12 @@ const EditAlbum = () => {
   useEffect(() => {
     const fetchAlbum = async () => {
       try {
-        const response = await getAlbumDescRequest(id);
-        const { albumName, artistName, releaseDate, genre, trackCount, songs } = response.data;
+        const albumData = await getAlbumDescRequest(id); // Devuelve los datos directamente
+        const { albumName, artistName, releaseDate, genre, trackCount, songs } = albumData;
+        
         setAlbumName(albumName);
         setArtistName(artistName);
-        setReleaseDate(releaseDate.substring(0, 10)); // Formato correcto: "yyyy-MM-dd"
+        setReleaseDate(releaseDate.substring(0, 10)); // Formato "yyyy-MM-dd"
         setGenre(genre);
         setTrackCount(trackCount);
         setSongs(songs || []);
@@ -41,11 +42,11 @@ const EditAlbum = () => {
         releaseDate, 
         genre, 
         trackCount, 
-        songs 
+        songs: songs.map(song => song.trim()) // Elimina espacios alrededor de las canciones
       });
       navigate(`/albums/${id}`);
     } catch (error) {
-      console.error('Error al editar el álbum', error);
+      console.error('Error al editar el álbum:', error);
       setError('Error al editar el álbum. Inténtalo nuevamente.');
     }
   };
@@ -109,7 +110,7 @@ const EditAlbum = () => {
             type="text" 
             placeholder="Ingrese canciones separadas por comas" 
             value={songs.join(', ')} 
-            onChange={(e) => setSongs(e.target.value.split(','))} 
+            onChange={(e) => setSongs(e.target.value.split(',').map(song => song.trim()))} 
           />
         </div>
         <button type="submit">Guardar Cambios</button>

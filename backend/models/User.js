@@ -1,30 +1,55 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-const userSchema = new mongoose.Schema({
-  correo: {
+const EsquemaPerfilAventurero = new mongoose.Schema({
+  nombreFantastico: {
     type: String,
-    required: true,
+    required: [true, "El nombre fantástico es obligatorio"]
+  },
+  apodoMagico: {
+    type: String,
+    required: [true, "El apodo mágico es necesario"],
+    unique: true
+  },
+  correoMisterioso: {
+    type: String,
+    required: [true, "El correo misterioso es obligatorio"],
     unique: true,
+    validate: {
+      validator: correo => /^([a-z0-9_.-]+)@([a-z.-]+)\.([a-z.]{2,6})$/.test(correo),
+      message: props => `${props.value} no es un correo misterioso válido`
+    }
   },
-  clave: {
+  claveSecreta: {
     type: String,
-    required: true,
-  },
-});
+    required: [true, "La clave secreta es obligatoria"],
+    minlength: [6, "La clave secreta debe tener al menos 6 caracteres"]
+  }
+}, { timestamps: true });
 
-// Método para encriptar la contraseña antes de guardarla
-userSchema.pre('save', async function (next) {
-  if (this.isModified('clave')) {
-    const salt = await bcrypt.genSalt(10);
-    this.clave = await bcrypt.hash(this.clave, salt);
+EsquemaPerfilAventurero.virtual('confirmacionClaveSecreta')
+  .get(function() { return this._confirmacionClaveSecreta; })
+  .set(function(value) { this._confirmacionClaveSecreta = value; });
+
+EsquemaPerfilAventurero.pre('validate', function(next) {
+  if (this.claveSecreta !== this.confirmacionClaveSecreta) {
+    this.invalidate('confirmacionClaveSecreta', 'Las claves secretas deben coincidir');
   }
   next();
 });
 
-// Método para comparar la contraseña
-userSchema.methods.comparePassword = function (clave) {
-  return bcrypt.compare(clave, this.clave);
-};
+EsquemaPerfilAventurero.pre('save', async function(next) {
+  if (this.isModified('claveSecreta')) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      this.claveSecreta = await bcrypt.hash(this.claveSecreta, salt);
+      next();
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    next();
+  }
+});
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model('User', EsquemaPerfilAventurero);
